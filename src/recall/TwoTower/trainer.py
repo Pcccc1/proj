@@ -254,7 +254,7 @@ def recall_topk(
             for item, sim in zip(raw_items, sims):
                 if exclude_history and sim <= -1e8:
                     continue
-                row.append(int(uid), int(item), float(sim))
+                row.append((int(uid), int(item), float(sim)))
         
 
     recall_df = pd.DataFrame(row, columns=['user_id', 'item_id', 'sim'])
