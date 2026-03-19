@@ -7,6 +7,9 @@ import time
 from src.data.save_data import save_recall_df_as_user_tuples_dict
 from src.recall.recall import get_predict
 
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 
 def load_config(config_path: str = 'src/recall/TwoTower/config.yml') -> dict:
     with open(config_path, 'r') as f:
@@ -67,15 +70,15 @@ def main():
             f'samples={info.get("num_train_samples", 0)}'
         )
         
-        today = time.strftime("%Y%m%d")
-        prefix = f'two_tower-{today}'
-        save_recall_df_as_user_tuples_dict(total_racall_df, phase_full_sim_dict, prefix=prefix)
+    today = time.strftime("%Y%m%d")
+    prefix = f'two_tower-{today}'
+    save_recall_df_as_user_tuples_dict(total_racall_df, phase_full_sim_dict, prefix=prefix)
 
-        _, top50_click = obtain_topk_click()
-        submit_df = get_predict(total_racall_df, 'sim', top50_click)
-        submit_path = Path('submit_two_tower.csv')
-        submit_df.to_csv(submit_path, index=False, header=None)
-        print(f"submit saved -> {submit_path}")
+    _, top50_click = obtain_topk_click()
+    submit_df = get_predict(total_racall_df, 'sim', top50_click)
+    submit_path = Path('submit_two_tower.csv')
+    submit_df.to_csv(submit_path, index=False, header=None)
+    print(f"submit saved -> {submit_path}")
 
 if __name__ == '__main__':
     main()
