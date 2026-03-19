@@ -2,6 +2,7 @@
 name: youtube_dnn
 max_seq_len: 30
 last_k : 8
+min_seq_len: 2
 batch_size : 1024
 epochs : 10
 lr : 0.001
@@ -13,7 +14,12 @@ embedding_dim : 256
 output_dim : 128
 dropout : 0.1
 temperature : 0.05
+user_batch_size: 1024
+item_batch_size: 8192
 topk : 200
+exclude_history: true
+use_amp: true
+log_every: 200
 model_dir : "data/user_data/recall/TwoTower/"
 start_phase: 7
 now_phase: 9

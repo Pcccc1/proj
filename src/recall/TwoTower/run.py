@@ -20,20 +20,30 @@ def main():
     confg = load_config()
     print(f"Loaded config: {confg}")
 
+    default_cfg = YoutubeDNNConfig()
     cfg = YoutubeDNNConfig(
-        max_seq_len=confg['max_seq_len'],
-        last_k=confg['last_k'],
-        batch_size=confg['batch_size'],
-        epochs=confg['epochs'],
-        lr=confg['lr'],
-        weight_decay=confg['weight_decay'],
-        embedding_dim=confg['embedding_dim'],
-        output_dim=confg['output_dim'],
-        dropout=confg['dropout'],
-        temperature=confg['temperature'],
-        topk=confg['topk'],
-        seed=confg['seed'],
-        device=confg['device'] if confg['device'] else YoutubeDNNConfig().device,
+        max_seq_len=confg.get('max_seq_len', default_cfg.max_seq_len),
+        last_k=confg.get('last_k', default_cfg.last_k),
+        min_seq_len=confg.get('min_seq_len', default_cfg.min_seq_len),
+        batch_size=confg.get('batch_size', default_cfg.batch_size),
+        epochs=confg.get('epochs', default_cfg.epochs),
+        lr=confg.get('lr', default_cfg.lr),
+        weight_decay=confg.get('weight_decay', default_cfg.weight_decay),
+        num_workers=confg.get('num_workers', default_cfg.num_workers),
+        embedding_dim=confg.get('embedding_dim', default_cfg.embedding_dim),
+        user_hidden_dims=tuple(confg.get('user_hidden_dims', default_cfg.user_hidden_dims)),
+        item_hidden_dims=tuple(confg.get('item_hidden_dims', default_cfg.item_hidden_dims)),
+        output_dim=confg.get('output_dim', default_cfg.output_dim),
+        dropout=confg.get('dropout', default_cfg.dropout),
+        temperature=confg.get('temperature', default_cfg.temperature),
+        user_batch_size=confg.get('user_batch_size', default_cfg.user_batch_size),
+        item_batch_size=confg.get('item_batch_size', default_cfg.item_batch_size),
+        topk=confg.get('topk', default_cfg.topk),
+        exclude_history=confg.get('exclude_history', default_cfg.exclude_history),
+        seed=confg.get('seed', default_cfg.seed),
+        use_amp=confg.get('use_amp', default_cfg.use_amp),
+        device=confg.get('device', default_cfg.device) or default_cfg.device,
+        log_every=confg.get('log_every', default_cfg.log_every),
     )
 
     total_racall_df = pd.DataFrame()
@@ -66,7 +76,7 @@ def main():
         
         print(
             f'TwoTower phase={phase} done, users={len(target_user_ids)}, '
-            f'rows={len(phase_recall_df)}, items={info.get("num_items", 0)}'
+            f'rows={len(phase_recall_df)}, items={info.get("num_items", 0)}, '
             f'samples={info.get("num_train_samples", 0)}'
         )
         

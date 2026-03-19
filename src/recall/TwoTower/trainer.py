@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, is_dataclass
 import torch
 from torch.utils.data import DataLoader
 from typing import Iterable
@@ -58,6 +58,19 @@ def _set_seed(seed: int) -> None:
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
+def _resolve_device(device: str) -> str:
+    if device.startswith('cuda') and not torch.cuda.is_available():
+        print('cuda is not available, using cpu instead.')
+        return 'cpu'
+
+    if device.startswith('mps'):
+        mps_ok = hasattr(torch.backends, 'mps') and torch.backends.mps.is_available()
+        if not mps_ok:
+            print('mps is not available, using cpu instead.')
+            return 'cpu'
+
+    return device
+
 
 def _build_item_vocab(user_item_time_dict: dict[int, list[tuple[int, float]]]) -> tuple[dict[int, int], np.ndarray]:
     all_items = []
@@ -76,9 +89,7 @@ def train(
         config: YoutubeDNNConfig | None = None,
 ) -> tuple[YoutubeDNNArtifact, dict]:
     config = config or YoutubeDNNConfig()
-    if config.device.startswith('cuda') and not torch.cuda.is_available():
-        print('cuda is not available, using cpu instead.')
-        config.device = 'cpu'
+    config.device = _resolve_device(config.device)
     _set_seed(config.seed)
 
     item2idx, idx2item = _build_item_vocab(user_item_time_dict)
@@ -240,7 +251,7 @@ def recall_topk(
                 if not seen_idx:
                     continue
                 col_idx = torch.as_tensor(np.asarray(seen_idx, dtype=np.int64) - 1, device=config.device)
-                score_mat[row_idx, col_idx] = 1e-9
+                score_mat[row_idx, col_idx] = -torch.inf
         
         top_scores, top_cols = torch.topk(score_mat, k=recall_topk, dim=1)
         top_item_idx = item_idx_tensor[top_cols] # (B, topk)
@@ -252,7 +263,7 @@ def recall_topk(
             raw_items = idx2item[top_item_idx_np[row_idx]].tolist()
             sims = top_scores_np[row_idx].tolist()
             for item, sim in zip(raw_items, sims):
-                if exclude_history and sim <= -1e8:
+                if exclude_history and not np.isfinite(sim):
                     continue
                 row.append((int(uid), int(item), float(sim)))
         
@@ -296,13 +307,23 @@ def load_artifact(file_path: str | Path, map_location: str | None = None) -> You
     payload = torch.load(file_path, map_location=map_location or 'cpu')
 
     cfg = payload['config']
-    cfg['user_hidden_dims'] = tuple(cfg['user_hidden_dims'])
-    cfg['item_hidden_dims'] = tuple(cfg['item_hidden_dims'])
-    config = YoutubeDNNConfig(**cfg)
+    if isinstance(cfg, YoutubeDNNConfig):
+        config = cfg
+    else:
+        if is_dataclass(cfg):
+            cfg = asdict(cfg)
+        if not isinstance(cfg, dict):
+            raise TypeError(f'Unsupported config payload type: {type(cfg)}')
+        cfg = dict(cfg)
+        if 'user_hidden_dims' in cfg:
+            cfg['user_hidden_dims'] = tuple(cfg['user_hidden_dims'])
+        if 'item_hidden_dims' in cfg:
+            cfg['item_hidden_dims'] = tuple(cfg['item_hidden_dims'])
+        config = YoutubeDNNConfig(**cfg)
+
     if map_location is not None:
         config.device = map_location
-    elif config.device.startswith('cuda') and not torch.cuda.is_available():
-        config.device = 'cpu'
+    config.device = _resolve_device(config.device)
     
     idx2item = payload['idx2item']
     item2idx = payload['item2idx']
