@@ -188,6 +188,7 @@ def _encode_all_items(artifact: YoutubeDNNArtifact) -> tuple[torch.Tensor, torch
     return all_idx, all_item_vec
 
 
+@torch.no_grad()
 def recall_topk(
     artifact: YoutubeDNNArtifact,
     user_item_time_dict: dict[int, list[tuple[int, float]]],
