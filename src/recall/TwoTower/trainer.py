@@ -11,6 +11,7 @@ from pathlib import Path
 from src.recall.TwoTower.YoutubeDNN import YoutubeDNN
 from src.recall.TwoTower.YoutubeDNNDataset import YouTubeDNNDataset, build_infer_tensors
 from src.data.convert_data import get_user_item_time_dict
+from src.data.feat_process import obtain_entire_item_feat_df
 
 
 @dataclass
@@ -126,6 +127,13 @@ def train(
         temperature=config.temperature,
         pad_idx=0
     ).to(config.device)
+
+    _, item_content_vec_dict = obtain_entire_item_feat_df()
+
+    model.init_item_embedding_from_content(
+        item2idx=item2idx,
+        item_content_dict=item_content_vec_dict,
+    )
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr, weight_decay=config.weight_decay)
     scaler = torch.cuda.amp.GradScaler(enabled=config.use_amp and config.device.startswith('cuda'))
