@@ -1,0 +1,20 @@
+
+name: youtube_dnn
+max_seq_len: 30
+last_k : 8
+batch_size : 1024
+epochs : 10
+lr : 0.001
+weight_decay : 0.000001
+num_workers : 0
+device : "mps"
+seed : 42
+embedding_dim : 256
+output_dim : 128
+dropout : 0.1
+temperature : 0.05
+topk : 200
+model_dir : "data/user_data/recall/TwoTower/"
+start_phase: 7
+now_phase: 9
+mode : 'offline' # online or offline
