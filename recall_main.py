@@ -16,7 +16,7 @@ if __name__ == '__main__':
     total_recom_df = pd.DataFrame()
     phase_full_sim_dict = {}
 
-    cf_methods = {'item_cf', 'bi-graph', 'swing', 'user_cf'}
+    cf_methods = {'item_cf', 'bi-graph', 'swing', 'user_cf', 'TwoTower'}
 
     if is_multi_processing:
         raise NotImplementedError('`is_multi_processing=True` is not implemented yet, please set it to False.')
