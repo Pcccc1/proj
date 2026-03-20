@@ -120,6 +120,7 @@ def do_multi_recall_results(recall_sim_pair_dict, user_item_time_dict, item_cont
     if 'TwoTower' in recall_methods:
         dnn_recall_item_dict = _read_dnn_results(phase)
         recall_item_list_dict['TwoTower'] = dnn_recall_item_dict
+        print(f"TwoTower recall done!")
     
     return agg_recall_results(recall_item_list_dict, is_norm=True)
 

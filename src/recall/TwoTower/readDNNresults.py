@@ -8,7 +8,7 @@ import pandas as pd
 import time
 
 def _recall_dnn_re_rank(recom_df, phase, mode='offline'):
-    all_click, click_q_time = get_phase_click(phase)
+    all_click, click_q_time = get_phase_click(phase=phase)
     phase_whole_click = get_whole_phase_click(all_click=all_click, click_q_time=click_q_time)
 
     if mode == 'online':
