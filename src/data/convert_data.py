@@ -29,3 +29,24 @@ def get_item_user_time_dict(df: pd.DataFrame)-> dict:
     
     item_user_time_dict = dict(zip(item_user_df['item_id'], item_user_df['user_time_list']))
     return item_user_time_dict
+
+def make_item_sim_tuple(group_df: pd.DataFrame):
+    group_df = group_df.sort_values(by='sim', ascending=False)
+    item_scores_tuples = list(zip(group_df['item_id'], group_df['sim']))
+    return item_scores_tuples
+
+def recall_df2dict(phase_df):
+    phase_df = phase_df.groupby('user_id').apply(lambda group: make_item_sim_tuple(group)).reset_index().rename(columns={0: 'item_sim_list'})
+    item_sim_list = phase_df['item_sim_list'].apply(
+        lambda item_sim_list: sorted(item_sim_list, key=lambda x: x[1], reverse=True)
+    )
+    phase_user_item_sim_dict = dict(zip(phase_df['user_id'], item_sim_list))
+    return phase_user_item_sim_dict
+
+def recall_dict2df(recall_dict):
+    recom_list = []
+    for u, item_sim_list in recall_dict.items():
+        for i, sim in item_sim_list:
+            recom_list.append((u, i, sim))
+    
+    return pd.DataFrame(recom_list, columns=['user_id', 'item_id', 'sim'])

@@ -3,6 +3,7 @@ from src.recall.bi_graph import bi_graph
 from src.recall.swing import swing
 from src.recall.usercf import user_cf
 from utils.recommend import item_based_recommend, user_based_recommend
+from src.recall.TwoTower.readDNNresults import _read_dnn_results
 from src.data.load_data import obtain_topk_click
 from tqdm import tqdm
 from collections import defaultdict
@@ -102,7 +103,7 @@ def agg_recall_results(recall_item_dict_list_dict, is_norm=True, weight_dict={})
 
 def do_multi_recall_results(recall_sim_pair_dict, user_item_time_dict, item_content_sim_dict,
                             target_user_ids=None, phase=None, item_cnt_dict=None,
-                            user_cnt_dict=None, recall_methods={'item_cf', 'bi-graph', 'swing', 'user_cf'}):
+                            user_cnt_dict=None, recall_methods={'item_cf', 'bi-graph', 'swing', 'user_cf', 'TwoTower'}):
     if target_user_ids is None:
         target_user_ids = user_item_time_dict.keys()
 
@@ -115,6 +116,10 @@ def do_multi_recall_results(recall_sim_pair_dict, user_item_time_dict, item_cont
             recall_item_dict = get_recall_results(sim_dict, user_item_time_dict, item_content_sim_dict, target_user_ids,
                                                   item_based=False, item_cnt_dict=item_cnt_dict, user_cnt_dict=user_cnt_dict)
         recall_item_list_dict[name] = recall_item_dict
+
+    if 'TwoTower' in recall_methods:
+        dnn_recall_item_dict = _read_dnn_results(phase)
+        recall_item_list_dict['TwoTower'] = dnn_recall_item_dict
     
     return agg_recall_results(recall_item_list_dict, is_norm=True)
 
