@@ -30,3 +30,36 @@ is_multi_processing = False
 now_phase = 9
 start_phase = 7
 mode = 'offline'  # online or offline
+
+topk_num = 200
+
+time_feat = ['day_id', 'hour_id']
+
+sparse_feat = ['user_id', 'item_id'] + time_feat
+
+sim_dense_feat = ['sim', 'sum_sim2int_1', 'sum_sim2int_2', 'sum_sim2int_3'] + \
+                ['max_sim2int_1', 'max_sim2int_2', 'max_sim2int_3', 'sim_rank_score'] + \
+                ['cnt_sim2int_1', 'cnt_sim2int_2', 'cnt_sim2int_3']
+
+dense_feat = item_dense_feat + sim_dense_feat
+max_len = 10
+var_len_feat = ['hist_item_id'] + [f'hist_{feat}' for feat in time_feat]
+
+
+basic_columns = ['user_id', 'item_id', 'phase', 'label']
+time_columns = ['time', 'day_id', 'hour_id', 'minute_id']
+hist_columns = ['hist_item_id', 'hist_time', 'hist_day_id', 'hist_hour_id', 'hist_minute_id']
+sim_columns = ['sim', 'sum_sim2int_1', 'sum_sim2int_2', 'sum_sim2int_3'] + \
+                ['max_sim2int_1', 'max_sim2int_2', 'max_sim2int_3'] + \
+                ['cnt_sim2int_1', 'cnt_sim2int_2', 'cnt_sim2int_3']
+hist_cnt_sim_feat = ['txt_cnt_sim_last_1', 'img_cnt_sim_last_1', 'cnt_sim_last_1'] + \
+                    ['txt_cnt_sim_last_2', 'img_cnt_sim_last_2', 'cnt_sim_last_2'] + \
+                    ['txt_cnt_sim_last_3', 'img_cnt_sim_last_3', 'cnt_sim_last_3']  
+hist_time_diff_feat = ['time_diff_1', 'time_diff_2', 'time_diff_3']
+w2v_sim_feat = ['w2v_sim_last_1', 'w2v_sim_last_2', 'w2v_sim_last_3']
+use_columns = basic_columns + time_columns + hist_columns + sim_columns
+
+user_interest_dense_feat = ['interest_' + col for col in item_dense_feat] + ['interest_degree', 'txt_interest_degree', 'img_interest_degree']
+
+lgb_cols = dense_feat + user_interest_dense_feat + hist_cnt_sim_feat + w2v_sim_feat + hist_time_diff_feat
+use_feats = ['user_id', 'item_id'] + ['hist_item_id'] + lgb_cols

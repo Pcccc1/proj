@@ -1,5 +1,5 @@
 import pandas as pd
-
+import time
 
 def make_item_time_tuple(group_df: pd.DataFrame) -> list:
     item_time_list = list(zip(group_df['item_id'], group_df['time']))
@@ -50,3 +50,11 @@ def recall_dict2df(recall_dict):
             recom_list.append((u, i, sim))
     
     return pd.DataFrame(recom_list, columns=['user_id', 'item_id', 'sim'])
+
+t = (2020, 4, 10, 0, 0, 0, 0, 0, 0)
+time_end = time.mktime(t)
+def time_info(time_delta):
+    time_stamp = time_end * time_delta
+    strcut_time = time.gmtime(time_stamp)
+    day, hour, minu = strcut_time.tm_mday + 1, strcut_time.tm_hour + 1, strcut_time.tm_min + 1
+    return day, hour, minu
