@@ -1,5 +1,6 @@
 import numpy as np
 from collections import defaultdict
+import pandas as pd
 
 def _safe_content_sim(item_content_sim_dict, left_item, right_item):
     left_sim_dict = item_content_sim_dict.get(left_item)
@@ -98,3 +99,20 @@ def re_rank(sim, i, u, item_cnt_dict, user_cnt_dict):
         heat = item_cnt_dict.get(i, 1.0) ** user_cnt_k + 10 - 10 ** user_cnt_k
     sim *= 2.0 / heat
     return sim
+
+
+def get_predict(df, pred_col, top_fill):
+    top_fill = [int(t) for t in top_fill.split(',')]
+    scores = [-1 * i for i in range(1, len(top_fill) + 1)]
+    ids = list(df['user_id'].unique())
+    fill_df = pd.DataFrame(ids * len(top_fill), columns=['user_id'])
+    fill_df.sort_values(by='user_id', inplace=True)
+    fill_df['item_id'] = top_fill * len(ids)
+    fill_df[pred_col] = scores * len(ids)
+    df = pd.concat([df, fill_df], axis=0, ignore_index=True, sort=False)
+    df.sort_values(pred_col, ascending=False, inplace=True)
+    df = df.drop_duplicates(subset=['user_id', 'item_id'], keep='first')
+    df['rank'] = df.groupby('user_id')[pred_col].rank(method='first', ascending=False)
+    df = df[df['rank'] <= 50]
+    df = df.groupby('user_id')['item_id'].apply(list).apply(pd.Series).reset_index()
+    return df

@@ -58,3 +58,18 @@ def time_info(time_delta):
     strcut_time = time.gmtime(time_stamp)
     day, hour, minu = strcut_time.tm_mday + 1, strcut_time.tm_hour + 1, strcut_time.tm_min + 1
     return day, hour, minu
+
+
+def sub2_df(filename):
+    rec_items = []
+    constant_sim = 100
+    with open(filename) as f:
+        for line in f:
+            row = line.strip().split(',')
+            uid = row[0]
+            iids = row[1:]
+            phase = uid % 11
+            for idx, iid in enumerate(iids):
+                rec_items.append((uid, int(iid), constant_sim - idx, phase))
+    
+    return pd.DataFrame(rec_items, columns=['user_id', 'item_id', 'sim', 'phase'])

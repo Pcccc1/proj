@@ -3,7 +3,8 @@ from src.recall.content_sim_item import get_content_sim_item
 from src.data.load_data import obtain_topk_click, get_phase_click, get_whole_phase_click
 from src.data.convert_data import get_user_item_time_dict
 from src.data.save_data import save_recall_df_as_user_tuples_dict
-from src.recall.recall import get_multi_source_sim_dict_results, do_multi_recall_results, get_predict
+from src.recall.recall import get_multi_source_sim_dict_results, do_multi_recall_results
+from utils.recommend import get_predict
 from config import *
 import pandas as pd
 

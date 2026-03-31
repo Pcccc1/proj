@@ -63,3 +63,9 @@ user_interest_dense_feat = ['interest_' + col for col in item_dense_feat] + ['in
 
 lgb_cols = dense_feat + user_interest_dense_feat + hist_cnt_sim_feat + w2v_sim_feat + hist_time_diff_feat
 use_feats = ['user_id', 'item_id'] + ['hist_item_id'] + lgb_cols
+
+
+online_output_path = 'prediction_result'
+offline_output_path = os.path.join(user_data_dir, 'prediction_result')
+
+output_path = online_output_path if mode == 'online' else offline_output_path

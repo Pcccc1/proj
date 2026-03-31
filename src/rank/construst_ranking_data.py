@@ -27,9 +27,7 @@ def get_history_and_last_click_df(click_df):
     return click_history_df, click_last_df
 
 
-def sliding_obtain_training_df(phase, is_sliding_compute_sim=False):
-    item_feat_df = read_item_feat_df()
-    item_content_sim_dict = get_content_sim_item(item_feat_df, topk=200)
+def sliding_obtain_training_df(phase, item_content_sim_dict, is_sliding_compute_sim=False):
     compute_mode = 'once' if not is_sliding_compute_sim else 'multi'
     saving_training_path = os.path.join(user_data_dir, 'training', mode, compute_mode, str(phase))
 
@@ -162,6 +160,9 @@ def organize_train_data(phase, item_content_vec_dict, is_sliding_compute_sim=Fal
 def organize_final_train_data_feat(target_phase, train_full_df_dict, processed_item_feat, item_content_vec_dict, item_raw_id2_idx_dict, feat_lbe_dict, val_full_df_dict=None, is_train_load_from_file=True, save_df_prefix=''):
     if mode == 'online':
         online_train_full_df_dict = train_full_df_dict
+    else:
+        train_full_df_dict = train_full_df_dict
+        val_full_df_dict = val_full_df_dict
     
     ranking_final_data = os.path.join(user_data_dir, 'ranking')
     if not os.path.exists(ranking_final_data):
