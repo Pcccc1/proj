@@ -66,9 +66,9 @@ def organize_user_feat_each_other(u, recall_items, user_item_dict, item_content_
 def organize_recall_feat(recall_item_dict, user_item_dict, item_sim_dict, item_content_vec_dict, phase):
 
     recom_columns = ['user_id', 'item_id', 'sim', 'phase'] + \
-                    [f'sum_sim2int_{i}' for i in range(3)] + \
-                    [f'max_sim2int_{i}' for i in range(3)] + \
-                    [f'cnt_sim2int_{i}' for i in range(3)] + \
+                    [f'sum_sim2int_{i}' for i in range(1, 4)] + \
+                    [f'max_sim2int_{i}' for i in range(1, 4)] + \
+                    [f'cnt_sim2int_{i}' for i in range(1, 4)] + \
                     ['hist_item_id', 'hist_time', 'hist_day', 'hist_hour', 'hist_min']
     recom_item = []
     for u, recall_items in recall_item_dict.items():

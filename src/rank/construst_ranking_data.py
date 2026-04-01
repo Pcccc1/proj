@@ -70,7 +70,7 @@ def sliding_obtain_training_df(phase, item_content_sim_dict, is_sliding_compute_
         else:
             sim_pair_dict = full_sim_pair_dict
         
-        user_recall_item_dict = do_multi_recall_results(sim_pair_dict, user_item_time_dict, item_content_sim_dict=item_content_sim_dict, phase=phase)
+        user_recall_item_dict = do_multi_recall_results(sim_pair_dict, user_item_time_dict, item_content_sim_dict=item_content_sim_dict, phase=phase, recall_methods=recall_methods)
         step_user_recall_item_dict[step] = user_recall_item_dict
         if is_sliding_compute_sim:
             step_strategy_sim_pair_dict[step] = sim_pair_dict
@@ -156,12 +156,12 @@ def organize_train_data(phase, item_content_vec_dict, is_sliding_compute_sim=Fal
 
         val_full_df = organize_label_interact_feat_df(phase_val_last_click_answer_df, phase_val_last_click_recall_recom_df, phase, False)
         val_target_uids = phase_val_last_click_answer_df['user_id'].unique()
-        save_train_val_path = os.path.join(saving_training_path, 'train_val_label_target_id_dataa.pkl')
+        save_train_val_path = os.path.join(saving_training_path, 'train_val_label_target_id_data.pkl')
         pickle.dump([train_full_df, val_full_df, val_target_uids], open(save_train_val_path, 'wb'))
         return train_full_df, val_full_df, val_target_uids
     else:
         print('online')
-        save_train_val_path = os.path.join(saving_training_path, 'train_val_label_target_id_dataa.pkl')
+        save_train_val_path = os.path.join(saving_training_path, 'train_val_label_target_id_data.pkl')
         pickle.dump(train_full_df, open(save_train_val_path, 'wb'))
         return train_full_df
     

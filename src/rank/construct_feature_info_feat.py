@@ -35,7 +35,7 @@ def sparse_feat_fit(total_click):
                                         feat_lbe_dict['item_id'].classes_) + 1))
     user_raw_id2_idx_dict = dict(zip(feat_lbe_dict['user_id'].classes_,
                                      feat_lbe_dict['user_id'].transform(
-                                        feat_lbe_dict['item_id'].classes_) + 1))
+                                        feat_lbe_dict['user_id'].classes_) + 1))
     return feat_lbe_dict, item_raw_id2_idx_dict, user_raw_id2_idx_dict
 
 
@@ -60,6 +60,7 @@ def sparse_feat_transform(df, item_raw_id2_idx_dict, feat_lbe_dict):
         if feat in time_feat:
             continue
         df[feat] = feat_lbe_dict[feat].transform(df[feat].astype(str)) + 1
+    return df
 
 
 def fillna(df, sparse_feat, dense_feat):
@@ -142,7 +143,7 @@ def obtain_user_hist_interest_feat(full_user_item_df, item_content_vec_dict):
         return [0.0, 0.0, 0.0]
     
     hist_target_items_series = full_user_item_df['hist_item_id'] + full_user_item_df['item_id'].apply(lambda x : [x])
-    full_user_item_df['txt_cnt_sim_last_1'], full_user_item_df['img_cnt_sim_last_2'], full_user_item_df['cnt_sim_last_1'] = zip(*hist_target_items_series.apply(lambda x: hist_2_target_cnt(x, 1)))
+    full_user_item_df['txt_cnt_sim_last_1'], full_user_item_df['img_cnt_sim_last_1'], full_user_item_df['cnt_sim_last_1'] = zip(*hist_target_items_series.apply(lambda x: hist_2_target_cnt(x, 1)))
     full_user_item_df['txt_cnt_sim_last_2'], full_user_item_df['img_cnt_sim_last_2'], full_user_item_df['cnt_sim_last_2'] = zip(*hist_target_items_series.apply(lambda x: hist_2_target_cnt(x, 2)))
     full_user_item_df['txt_cnt_sim_last_3'], full_user_item_df['img_cnt_sim_last_3'], full_user_item_df['cnt_sim_last_3'] = zip(*hist_target_items_series.apply(lambda x: hist_2_target_cnt(x, 3))) 
 
@@ -162,6 +163,7 @@ def obtain_user_hist_interest_feat(full_user_item_df, item_content_vec_dict):
     
     hist_target_time_series = full_user_item_df['hist_time'] + full_user_item_df['time'].apply(lambda x: [x])
     full_user_item_df['time_diff_1'], full_user_item_df['time_diff_2'], full_user_item_df['time_diff_3'] = zip(*hist_target_time_series.apply(hist_2_target_time_diff))
+    return full_user_item_df
 
 
 def organize_word2vec_feat(full_user_item_df, w2v_item_embed_dict):
@@ -179,6 +181,7 @@ def organize_word2vec_feat(full_user_item_df, w2v_item_embed_dict):
             hist_item = hist_target_item_list[-hist_no]
             if str(hist_item) in w2v_item_embed_dict:
                 w2v_item = np.dot(w2v_item_embed_dict[str(target_item)], w2v_item_embed_dict[str(hist_item)])
+                return w2v_item
 
         return 0.0
 

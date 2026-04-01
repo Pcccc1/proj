@@ -51,3 +51,4 @@ def downsample_by_user(df):
 
     data = pd.concat([data_neg, data_pos], ignore_index=True)
     data = data.sample(frac=1.0)
+    return data
