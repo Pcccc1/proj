@@ -13,7 +13,7 @@ import pandas as pd
 import pickle
 
 
-def rank_pipline(target_phase, train_full_df_dict, processed_item_feat, item_content_sim_dict, item_content_vec_dict, item_raw_id2_idx_dict, feat_lbe_dict, val_full_df_dict=None, output_ranking_filename=None, model_names=['ranker'], 
+def rank_pipline(target_phase, train_full_df_dict, processed_item_feat, item_content_sim_dict, item_content_vec_dict, item_raw_id2_idx_dict, user_raw_id2_idx_dict, feat_lbe_dict, val_full_df_dict=None, output_ranking_filename=None, model_names=['ranker'], 
                  is_train_load_from_file=True, is_infer_load_from_file=True, recall_prefix='', save_df_prefix=''):
     global total_recom_lgb_df
     if mode == 'offline':
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         print(f"begin phase {i} ranking...")
         output_ranking_filename = output_ranking_filename + "_" + str(i)
         rank_pipline(i, train_full_df_dict, processed_item_feat_df, item_content_sim_dict, item_content_vec_dict, 
-                     item_raw_id2_idx_dict, feat_lbe_dict, val_full_df_dict, output_ranking_filename=output_ranking_filename + '.csv', 
+                     item_raw_id2_idx_dict, user_raw_id2_idx_dict, feat_lbe_dict, val_full_df_dict, output_ranking_filename=output_ranking_filename + '.csv', 
                      model_names=['ranker', 'din'], is_train_load_from_file=True, is_infer_load_from_file=True, 
                      recall_prefix=f'recall-{today}_',save_df_prefix=f'{today}_')
                     

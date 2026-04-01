@@ -145,7 +145,7 @@ def build_din_input(df, feature_names, seq_feature_name='hist_item_id', seq_leng
             model_input[name] = np.array(df[name].values.tolist())
             continue
     
-        if name == seq_feature_name:
+        if name == seq_length_name:
             if seq_feature_name not in df.columns:
                 raise ValueError(f"Sequence feature '{seq_feature_name}' not found in DataFrame columns.")
             seq_np = np.array(df[seq_feature_name].values.tolist())
