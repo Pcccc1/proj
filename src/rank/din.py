@@ -6,7 +6,8 @@ from deepctr_torch.inputs import SparseFeat, DenseFeat, VarLenSparseFeat, get_fe
 from deepctr_torch.models import DIN
 from config import *
 
-from src.data.load_data import get_phase_click, get_whole_phase_click, get_user_item_time_dict
+from src.data.load_data import get_phase_click, get_whole_phase_click
+from src.data.convert_data import get_user_item_time_dict
 
 np.random.seed(42)
 torch.manual_seed(42)
