@@ -27,7 +27,7 @@ def organize_label_interact_feat_df(click_last_df, click_last_recall_recom_df, p
             click_last_cold_start_df[sim_col] = mean_value
         click_last_cold_start_df = pd.merge(click_last_cold_start_df, dfm_df[['user_id'] + hist_columns], on='user_id', how='left')
         print(f'add cold start items: {len(cold_start_items)}')
-        dfm_df = dfm_df.append(click_last_cold_start_df[use_columns])
+        dfm_df = pd.concat([dfm_df, click_last_cold_start_df[use_columns]], ignore_index=True)
 
     return dfm_df
 
@@ -46,7 +46,7 @@ def downsample_by_user(df):
     data_u_neg = data_neg.groupby('user_id', group_keys=False).apply(group_neg_sample_func)
     data_i_neg = data_neg.groupby('item_id', group_keys=False).apply(group_neg_sample_func)
 
-    data_neg = data_u_neg.append(data_i_neg)
+    data_neg = pd.concat([data_u_neg, data_i_neg], ignore_index=True)
     data_neg = data_neg.sort_values(['user_id', 'sim']).drop_duplicates(['user_id', 'item_id'], keep='last')
 
     data = pd.concat([data_neg, data_pos], ignore_index=True)
