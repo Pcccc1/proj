@@ -10,6 +10,14 @@ import pickle
 import pandas as pd
 from src.data.convert_data import get_user_item_time_dict, time_info
 from src.recall.content_sim_item import get_content_sim_item
+from collections import defaultdict
+
+def to_regular_dict(obj):
+    if isinstance(obj, defaultdict):
+        obj = dict(obj)
+    if isinstance(obj, dict):
+        return {k: to_regular_dict(v) for k, v in obj.items()}
+    return obj
 
 def get_history_and_last_click_df(click_df):
     click_df = click_df.sort_values(by=['user_id', 'time'])
@@ -46,6 +54,7 @@ def sliding_obtain_training_df(phase, item_content_sim_dict, is_sliding_compute_
     total_step = 10
     step = 0
     full_sim_pair_dict = get_multi_source_sim_dict_results(click_history_df, recall_methods=recall_methods)
+    full_sim_pair_dict = to_regular_dict(full_sim_pair_dict)
     pickle.dump(full_sim_pair_dict, open(os.path.join(saving_training_path, 'full_sim_pair_dict.pkl'), 'wb'))
 
     step_user_recall_item_dict = {}
