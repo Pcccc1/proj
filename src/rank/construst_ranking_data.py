@@ -70,7 +70,7 @@ def sliding_obtain_training_df(phase, item_content_sim_dict, is_sliding_compute_
         else:
             sim_pair_dict = full_sim_pair_dict
         
-        user_recall_item_dict = do_multi_recall_results(sim_pair_dict, user_item_time_dict, item_content_sim_dict=item_content_sim_dict)
+        user_recall_item_dict = do_multi_recall_results(sim_pair_dict, user_item_time_dict, item_content_sim_dict=item_content_sim_dict, phase=phase)
         step_user_recall_item_dict[step] = user_recall_item_dict
         if is_sliding_compute_sim:
             step_strategy_sim_pair_dict[step] = sim_pair_dict
