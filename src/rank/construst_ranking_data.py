@@ -35,7 +35,7 @@ def sliding_obtain_training_df(phase, item_content_sim_dict, is_sliding_compute_
         print(f'phase{phase} training data already exists, loading...')
         return
     
-    all_click, click_q_time = get_phase_click(phase)
+    all_click, click_q_time = get_phase_click(phase=phase)
 
     click_history_df = all_click
     recall_methods = {'item_cf', 'bi-graph', 'user_cf', 'swing'}
