@@ -32,7 +32,7 @@ def rank_pipline(target_phase, train_full_df_dict, processed_item_feat, item_con
     def gen_rec_results(output_model_name):
         global total_recom_lgb_df
         if mode == 'offline':
-            assert len(set(infer_answer_file_prefix['user_id'].unique()) - set(total_recom_lgb_df[total_recom_lgb_df['phase'] == target_phase].user_id.unique()))  == 0
+            assert len(set(infer_recall_recom_df['user_id'].unique()) - set(total_recom_lgb_df[total_recom_lgb_df['phase'] == target_phase].user_id.unique()))  == 0
         total_recom_lgb_df = total_recom_lgb_df[total_recom_lgb_df['phase'] != target_phase]
         online_infer_recall_df = infer_recall_recom_df[['user_id', 'item_id', 'prob']].rename(columns={'prob': 'sim'})
         online_infer_recall_df['phase'] = target_phase
@@ -52,12 +52,12 @@ def rank_pipline(target_phase, train_full_df_dict, processed_item_feat, item_con
         lgb_ranker = lgb_main(train_final_df, val_final_df)
         lgb_rank_infer_ans = lgb_ranker.predict(infer_df[lgb_cols])
         infer_recall_recom_df['prob'] = lgb_rank_infer_ans
-        gen_rec_results('lgb')
+        gen_rec_results('ranker')
 
     if 'din' in model_names:
         din_model, feature_names = din_main(target_phase, train_final_df, item_raw_id2_idx_dict, item_content_vec_dict, feat_lbe_dict, val_final_df)
         infer_input = build_din_input(infer_df, feature_names)
-        din_infer_ans = din_main.predict(infer_input, batch_size=BATCH_SIZE)
+        din_infer_ans = din_model.predict(infer_input, batch_size=BATCH_SIZE)
         infer_recall_recom_df['prob'] = din_infer_ans
         gen_rec_results('din')
 
@@ -86,13 +86,13 @@ if __name__ == '__main__':
         for i in range(start_phase, now_phase + 1):
             if i in online_train_full_df_dict:
                 continue
-            online_train_full_df = organize_train_data(i, item_content_vec_dict, is_sliding_compute_sim=False, load_from_file=True)
+            online_train_full_df = organize_train_data(i, item_content_vec_dict, item_content_sim_dict, is_sliding_compute_sim=False, load_from_file=True)
             online_train_full_df_dict[i] = online_train_full_df
     else:
         train_full_df_dict = {}
         val_full_df_dict = {}
         for i in range(start_phase, now_phase + 1):
-            train_full_df, val_full_df, val_target_uids = organize_train_data(i, is_sliding_compute_sim=False, load_from_file=True)
+            train_full_df, val_full_df, val_target_uids = organize_train_data(i, item_content_vec_dict, item_content_sim_dict, is_sliding_compute_sim=False, load_from_file=True)
             train_full_df_dict[i] = train_full_df
             val_full_df_dict[i] = val_full_df
     

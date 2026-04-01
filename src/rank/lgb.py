@@ -41,7 +41,7 @@ def lgb_main(train_final_df, val_final_df=None):
         lgb_ranker.fit(
             train_final_df[lgb_cols],
             train_final_df['label'],
-            g_train=g_train
+            group=g_train
         )
     
     print('LightGBM model training completed.')

@@ -11,7 +11,7 @@ def obtain_user_hist_feat(u, user_item_dict):
     return [user_hist_seq, user_hist_time_seq, list(user_hist_day_seq), list(user_hist_hour_seq), list(user_hist_min_seq)]
 
 
-def organize_user_feat_each_other(u, recall_items, user_item_dict, item_content_vec_dict, strategy_item_dict, phase):
+def organize_user_feat_each_other(u, recall_items, user_item_dict, item_content_sim_dict, strategy_item_dict, phase):
 
     user_hist_info = obtain_user_hist_feat(u, user_item_dict)
 
@@ -35,7 +35,7 @@ def organize_user_feat_each_other(u, recall_items, user_item_dict, item_content_
                     sum_sim_value += strategy_sim_value
                     max_sim_value = max(max_sim_value, strategy_sim_value)
                 
-                cnt_sim_value = item_content_vec_dict.get(hist_i, {}).get(recall_i, 0.0) + item_content_vec_dict.get(recall_i, {}).get(hist_i, 0.0)
+                cnt_sim_value = item_content_sim_dict.get(hist_i, {}).get(recall_i, 0.0) + item_content_sim_dict.get(recall_i, {}).get(hist_i, 0.0)
                 sum_cf_sim2_hist.append(sum_sim_value)
                 max_cf_sim2_hist.append(max_sim_value)
                 cnt_sim2_hist.append(cnt_sim_value)
@@ -63,16 +63,16 @@ def organize_user_feat_each_other(u, recall_items, user_item_dict, item_content_
     return recom_items
         
 
-def organize_recall_feat(recall_item_dict, user_item_dict, item_sim_dict, item_content_vec_dict, phase):
+def organize_recall_feat(recall_item_dict, user_item_dict, item_sim_dict, item_content_sim_dict, phase):
 
     recom_columns = ['user_id', 'item_id', 'sim', 'phase'] + \
                     [f'sum_sim2int_{i}' for i in range(1, 4)] + \
                     [f'max_sim2int_{i}' for i in range(1, 4)] + \
                     [f'cnt_sim2int_{i}' for i in range(1, 4)] + \
-                    ['hist_item_id', 'hist_time', 'hist_day', 'hist_hour', 'hist_min']
+                    ['hist_item_id', 'hist_time', 'hist_day', 'hist_hour', 'hist_minute']
     recom_item = []
     for u, recall_items in recall_item_dict.items():
-        recom_item.extend(organize_user_feat_each_other(u, recall_items, user_item_dict, item_content_vec_dict, item_sim_dict, phase))
+        recom_item.extend(organize_user_feat_each_other(u, recall_items, user_item_dict, item_content_sim_dict, item_sim_dict, phase))
 
     recall_recom_df = pd.DataFrame(recom_item, columns=recom_columns)
     recall_recom_df['sim_rank_score'] = recall_recom_df.groupby('user_id')['sim'].rank(method='first', ascending=True) / topk_num

@@ -143,6 +143,7 @@ def build_din_input(df, feature_names, seq_feature_name='hist_item_id', seq_leng
     for name in feature_names:
         if name in df.columns:
             model_input[name] = np.array(df[name].values.tolist())
+            continue
     
         if name == seq_feature_name:
             if seq_feature_name not in df.columns:

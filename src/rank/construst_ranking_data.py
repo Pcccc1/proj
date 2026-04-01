@@ -76,21 +76,21 @@ def sliding_obtain_training_df(phase, item_content_sim_dict, is_sliding_compute_
             step_strategy_sim_pair_dict[step] = sim_pair_dict
         step += 1
 
-        pickle.dump(step_user_recall_item_dict, open(os.path.join(saving_training_path, 'step_user_recall_item_dict.pkl'), 'wb'))
+    pickle.dump(step_user_recall_item_dict, open(os.path.join(saving_training_path, 'step_user_recall_item_dict.pkl'), 'wb'))
 
-        if is_sliding_compute_sim:
-            pickle.dump(step_strategy_sim_pair_dict, open(os.path.join(saving_training_path, 'step_strategy_sim_pair_dict.pkl'), 'wb'))
+    if is_sliding_compute_sim:
+        pickle.dump(step_strategy_sim_pair_dict, open(os.path.join(saving_training_path, 'step_strategy_sim_pair_dict.pkl'), 'wb'))
         
-        if mode == 'offline':
-            all_user_item_dict = get_user_item_time_dict(all_click)
+    if mode == 'offline':
+        all_user_item_dict = get_user_item_time_dict(all_click)
 
-            val_user_recall_item_dict = do_multi_recall_results(full_sim_pair_dict, all_user_item_dict, item_content_sim_dict=item_content_sim_dict, target_user_ids=click_q_time['user_id'].unique(), recall_methods=recall_methods)
+        val_user_recall_item_dict = do_multi_recall_results(full_sim_pair_dict, all_user_item_dict, item_content_sim_dict=item_content_sim_dict, target_user_ids=click_q_time['user_id'].unique(), recall_methods=recall_methods)
 
-            pickle.dump(val_user_recall_item_dict, open(os.path.join(saving_training_path, 'val_user_recall_item_dict.pkl'), 'wb'))
+        pickle.dump(val_user_recall_item_dict, open(os.path.join(saving_training_path, 'val_user_recall_item_dict.pkl'), 'wb'))
         
 
 
-def organize_train_data(phase, item_content_vec_dict, is_sliding_compute_sim=False, load_from_file=True, total_step=10):
+def organize_train_data(phase, item_content_sim_dict, is_sliding_compute_sim=False, load_from_file=True, total_step=10):
     compute_mode = 'once' if not is_sliding_compute_sim else 'multi'
     saving_training_path = os.path.join(user_data_dir, 'training', mode, compute_mode, str(phase))
 
@@ -126,7 +126,7 @@ def organize_train_data(phase, item_content_vec_dict, is_sliding_compute_sim=Fal
             recall_item_dict=user_recall_item_dict,
             user_item_dict=user_item_time_dict,
             item_sim_dict=strategy_sim_pair_dict,
-            item_content_vec_dict=item_content_vec_dict,
+            item_content_sim_dict=item_content_sim_dict,
             phase=phase
         )
 
@@ -152,7 +152,7 @@ def organize_train_data(phase, item_content_vec_dict, is_sliding_compute_sim=Fal
 
         phase_val_last_click_answer_df = pd.read_csv(f'{offline_answer_path}/{infer_answer_file_prefix}-{phase}.csv', header=None, 
                                                         names=['user_id', 'item_id', 'time'])
-        phase_val_last_click_recall_recom_df = organize_recall_feat(val_user_recall_item_dict, val_user_item_dict, full_sim_pair_dict, item_content_vec_dict, phase)
+        phase_val_last_click_recall_recom_df = organize_recall_feat(val_user_recall_item_dict, val_user_item_dict, full_sim_pair_dict, item_content_sim_dict, phase)
 
         val_full_df = organize_label_interact_feat_df(phase_val_last_click_answer_df, phase_val_last_click_recall_recom_df, phase, False)
         val_target_uids = phase_val_last_click_answer_df['user_id'].unique()
@@ -186,7 +186,7 @@ def organize_final_train_data_feat(target_phase, train_full_df_dict, processed_i
         train_final_df = pickle.load(open(train_df_path, 'rb'))
         word2vec_item_embed_dict = pickle.load(open(w2v_path, 'rb'))
         if mode == 'offline':
-            val_final_df = pickle.load(open(val_df_path), 'rb')
+            val_final_df = pickle.load(open(val_df_path, 'rb'))
             return train_final_df, val_final_df, word2vec_item_embed_dict
         return train_final_df, word2vec_item_embed_dict
     else:
@@ -260,7 +260,7 @@ def organize_infer_data(target_phase, word2vec_item_embed_dict, processed_item_f
 
     if is_infer_load_from_file and os.path.exists(infer_df_path):
         print('load infer final df from file...')
-        infer_recall_recom_df = pickle.load(open(infer_df_path, 'rb'))
+        infer_recall_recom_df, infer_df = pickle.load(open(infer_df_path, 'rb'))
     else:
         infer_recall_recom_df, infer_df = infer_process(target_phase, processed_item_feat, item_content_sim_dict, item_content_vec_dict,
                                                         item_raw_id2_idx_dict, feat_lbe_dict, load_from_file=True, is_use_whole_click=True,
