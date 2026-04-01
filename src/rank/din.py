@@ -181,10 +181,10 @@ def generate_din_feature_columns(sparse_features, dense_features, feat_lbe_dict)
     return feature_names, linear_feature_columns, dnn_feature_columns
 
 
-def din_main(target_phase, train_final_df, item_raw_id2_idx_dict, item_content_vec_dict, feat_lbe_dict, val_final_df=None):
+def din_main(target_phase, train_final_df, item_raw_id2_idx_dict, user_raw_id2_idx_dict, item_content_vec_dict, feat_lbe_dict, val_final_df=None):
     print('generate din feature columns...')
     item_embed_np = get_init_item_embed(item_raw_id2_idx_dict, item_content_vec_dict)
-    user_embed_np = get_init_user_embed(target_phase, item_raw_id2_idx_dict, item_content_vec_dict, is_use_whole_click=True)
+    user_embed_np = get_init_user_embed(target_phase, user_raw_id2_idx_dict, item_content_vec_dict, is_use_whole_click=True)
 
     feature_names, linear_feature_columns, dnn_feature_columns = generate_din_feature_columns(
         ['user_id', 'item_id'],

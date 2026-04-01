@@ -69,7 +69,7 @@ def organize_recall_feat(recall_item_dict, user_item_dict, item_sim_dict, item_c
                     [f'sum_sim2int_{i}' for i in range(1, 4)] + \
                     [f'max_sim2int_{i}' for i in range(1, 4)] + \
                     [f'cnt_sim2int_{i}' for i in range(1, 4)] + \
-                    ['hist_item_id', 'hist_time', 'hist_day', 'hist_hour', 'hist_minute']
+                    ['hist_item_id', 'hist_time', 'hist_day_id', 'hist_hour_id', 'hist_minute_id']
     recom_item = []
     for u, recall_items in recall_item_dict.items():
         recom_item.extend(organize_user_feat_each_other(u, recall_items, user_item_dict, item_content_sim_dict, item_sim_dict, phase))

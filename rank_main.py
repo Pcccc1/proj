@@ -45,7 +45,7 @@ def rank_pipline(target_phase, train_full_df_dict, processed_item_feat, item_con
         if not os.path.exists(rank_output_dir):
             os.makedirs(rank_output_dir)
         result.to_csv(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}', index=False, header=None)
-        pickle.dump(total_recom_lgb_df, open(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}', 'wb'))
+        pickle.dump(total_recom_lgb_df, open(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}-pkl', 'wb'))
         print('generate rank result done')
 
     if 'ranker' in model_names:
@@ -55,7 +55,7 @@ def rank_pipline(target_phase, train_full_df_dict, processed_item_feat, item_con
         gen_rec_results('ranker')
 
     if 'din' in model_names:
-        din_model, feature_names = din_main(target_phase, train_final_df, item_raw_id2_idx_dict, item_content_vec_dict, feat_lbe_dict, val_final_df)
+        din_model, feature_names = din_main(target_phase, train_final_df, item_raw_id2_idx_dict, user_raw_id2_idx_dict, item_content_vec_dict, feat_lbe_dict, val_final_df)
         infer_input = build_din_input(infer_df, feature_names)
         din_infer_ans = din_model.predict(infer_input, batch_size=BATCH_SIZE)
         infer_recall_recom_df['prob'] = din_infer_ans
@@ -82,12 +82,12 @@ if __name__ == '__main__':
 
 # 构造除了feature之外的训练数据
     if mode == 'online':
-        online_train_full_df_dict = {}
+        train_full_df_dict = {}
         for i in range(start_phase, now_phase + 1):
-            if i in online_train_full_df_dict:
+            if i in train_full_df_dict:
                 continue
-            online_train_full_df = organize_train_data(i, item_content_vec_dict, item_content_sim_dict, is_sliding_compute_sim=False, load_from_file=True)
-            online_train_full_df_dict[i] = online_train_full_df
+            train_full_df = organize_train_data(i, item_content_vec_dict, item_content_sim_dict, is_sliding_compute_sim=False, load_from_file=True)
+            train_full_df_dict[i] = train_full_df
     else:
         train_full_df_dict = {}
         val_full_df_dict = {}
