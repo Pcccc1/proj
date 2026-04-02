@@ -35,7 +35,7 @@ def lgb_main(train_final_df, val_final_df=None):
             eval_group=[g_val],
             eval_at=[50],
             eval_metric=['auc'],
-            early_stopping_rounds=50,
+            callbacks=[lgb.early_stopping(stopping_rounds=50)]
         )
     else:
         lgb_ranker.fit(
