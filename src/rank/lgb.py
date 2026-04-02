@@ -31,7 +31,7 @@ def lgb_main(train_final_df, val_final_df=None):
             train_final_df[lgb_cols],
             train_final_df['label'],
             group=g_train,
-            eval_set=[val_final_df[lgb_cols], val_final_df['label']],
+            eval_set=[(val_final_df[lgb_cols], val_final_df['label'])],
             eval_group=[g_val],
             eval_at=[50],
             eval_metric=['auc'],
