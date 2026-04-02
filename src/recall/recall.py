@@ -82,7 +82,7 @@ def norm_user_recall_item_dict(recall_item_dict):
         norm_recall_item_dict[u] = norm_recall_item_score_list(sorted_recall_item_list)
     return norm_recall_item_dict
 
-def agg_recall_results(recall_item_dict_list_dict, is_norm=True, weight_dict={}):
+def agg_recall_results(recall_item_dict_list_dict, is_norm=True, weight_dict={}, ret_type='df'):
     agg_recall_item_dict = defaultdict(lambda: defaultdict(float))
     for name, recall_item_dict in recall_item_dict_list_dict.items():
         if is_norm:
@@ -91,19 +91,27 @@ def agg_recall_results(recall_item_dict_list_dict, is_norm=True, weight_dict={})
         for u, recall_items in recall_item_dict.items():
             for i, score in recall_items:
                 agg_recall_item_dict[u][i] += weight * score
-        
-    recall_u_i_score_pair_list = []
-    for u, recall_item_dict in agg_recall_item_dict.items():
-        for i, score in recall_item_dict.items():
-            recall_u_i_score_pair_list.append((u, i, score))
+    if ret_type == 'tuple':
+        agg_recall_item_tuple_dict = {}
+        for u, recall_item_dict in agg_recall_item_dict.items():
+            sorted_recall_item_tuples = sorted(recall_item_dict.items(), key=lambda x: x[1], reverse=True)
+            agg_recall_item_tuple_dict[u] = sorted_recall_item_tuples
+        return agg_recall_item_tuple_dict
+            
     
-    recall_df = pd.DataFrame.from_records(recall_u_i_score_pair_list, columns=['user_id', 'item_id', 'sim'])
-    return recall_df
+    if ret_type == 'df':
+        recall_u_i_score_pair_list = []
+        for u, recall_item_dict in agg_recall_item_dict.items():
+            for i, score in recall_item_dict.items():
+                recall_u_i_score_pair_list.append((u, i, score))
+        
+        recall_df = pd.DataFrame.from_records(recall_u_i_score_pair_list, columns=['user_id', 'item_id', 'sim'])
+        return recall_df
 
 
 def do_multi_recall_results(recall_sim_pair_dict, user_item_time_dict, item_content_sim_dict,
                             target_user_ids=None, phase=None, item_cnt_dict=None,
-                            user_cnt_dict=None, recall_methods={'item_cf', 'bi-graph', 'swing', 'user_cf', 'TwoTower'}):
+                            user_cnt_dict=None, recall_methods={'item_cf', 'bi-graph', 'swing', 'user_cf', 'TwoTower'}, ret_type='df'):
     if target_user_ids is None:
         target_user_ids = user_item_time_dict.keys()
 
@@ -122,6 +130,6 @@ def do_multi_recall_results(recall_sim_pair_dict, user_item_time_dict, item_cont
         recall_item_list_dict['TwoTower'] = dnn_recall_item_dict
         print(f"TwoTower recall done!")
     
-    return agg_recall_results(recall_item_list_dict, is_norm=True)
+    return agg_recall_results(recall_item_list_dict, is_norm=True, ret_type=ret_type)
 
 

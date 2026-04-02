@@ -70,7 +70,7 @@ def sliding_obtain_training_df(phase, item_content_sim_dict, is_sliding_compute_
         else:
             sim_pair_dict = full_sim_pair_dict
         
-        user_recall_item_dict = do_multi_recall_results(sim_pair_dict, user_item_time_dict, item_content_sim_dict=item_content_sim_dict, phase=phase, recall_methods=recall_methods)
+        user_recall_item_dict = do_multi_recall_results(sim_pair_dict, user_item_time_dict, item_content_sim_dict=item_content_sim_dict, phase=phase, recall_methods=recall_methods, ret_type='tuple')
         step_user_recall_item_dict[step] = user_recall_item_dict
         if is_sliding_compute_sim:
             step_strategy_sim_pair_dict[step] = sim_pair_dict
@@ -84,7 +84,7 @@ def sliding_obtain_training_df(phase, item_content_sim_dict, is_sliding_compute_
     if mode == 'offline':
         all_user_item_dict = get_user_item_time_dict(all_click)
 
-        val_user_recall_item_dict = do_multi_recall_results(full_sim_pair_dict, all_user_item_dict, item_content_sim_dict=item_content_sim_dict, target_user_ids=click_q_time['user_id'].unique(), recall_methods=recall_methods)
+        val_user_recall_item_dict = do_multi_recall_results(full_sim_pair_dict, all_user_item_dict, item_content_sim_dict=item_content_sim_dict, target_user_ids=click_q_time['user_id'].unique(), recall_methods=recall_methods, ret_type='tuple')
 
         pickle.dump(val_user_recall_item_dict, open(os.path.join(saving_training_path, 'val_user_recall_item_dict.pkl'), 'wb'))
         
@@ -238,7 +238,7 @@ def infer_process(phase, processed_item_feat, item_content_sim_dict, item_conten
         user_cnt_dict = all_click.groupby('user_id')['item_id'].count().to_dict()
         full_sim_pair_dict = get_multi_source_sim_dict_results(phase_click, recall_methods=recall_methods)
         infer_user_recall_item_dict = do_multi_recall_results(full_sim_pair_dict, infer_user_item_time_dict, item_content_sim_dict, target_user_ids=target_infer_user_df['user_id'].unique(),
-                                                              phase=phase, item_cnt_dict=item_cnt_dict, user_cnt_dict=user_cnt_dict, recall_methods=recall_methods | {'TwoTower'})
+                                                              phase=phase, item_cnt_dict=item_cnt_dict, user_cnt_dict=user_cnt_dict, recall_methods=recall_methods | {'TwoTower'}, ret_type='tuple')
 
         pickle.dump(full_sim_pair_dict, open(sim_path, 'wb'))
         pickle.dump(infer_user_recall_item_dict, open(recall_path, 'wb'))
