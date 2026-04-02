@@ -10,7 +10,7 @@ def get_word2vec_feat(full_user_item_df):
     seq_list = full_user_item_df['hist_item_id'].apply(lambda x: [str(i) for i in x]).values
     print(seq_list.shape)
     begin_time = time.time()
-    model = Word2Vec(seq_list, size=32, window=5, min_count=0, workers=40, sg=0, hs=1)
+    model = Word2Vec(seq_list, vector_size=32, window=5, min_count=0, workers=40, sg=0, hs=1)
     end_time = time.time()
     run_time = end_time - begin_time
     print(f'word2vec time: {round(run_time, 2)}')
