@@ -98,7 +98,7 @@ def organize_train_data(phase, item_content_sim_dict, is_sliding_compute_sim=Fal
     if load_from_file and os.path.exists(save_result_train_val_path):
         return pickle.load(open(save_result_train_val_path, 'rb'))
     
-    all_click, test_q_time = get_phase_click(phase)
+    all_click, test_q_time = get_phase_click(phase=phase)
 
     click_history_df = all_click
 
