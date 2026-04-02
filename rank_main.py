@@ -92,7 +92,7 @@ if __name__ == '__main__':
         train_full_df_dict = {}
         val_full_df_dict = {}
         for i in range(start_phase, now_phase + 1):
-            train_full_df, val_full_df, val_target_uids = organize_train_data(i, item_content_vec_dict, item_content_sim_dict, is_sliding_compute_sim=False, load_from_file=True)
+            train_full_df, val_full_df, val_target_uids = organize_train_data(i, item_content_sim_dict, is_sliding_compute_sim=False, load_from_file=True)
             train_full_df_dict[i] = train_full_df
             val_full_df_dict[i] = val_full_df
     
