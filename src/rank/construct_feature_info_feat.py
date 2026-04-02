@@ -68,9 +68,14 @@ def sparse_feat_transform(df, item_raw_id2_idx_dict, feat_lbe_dict):
 
 def fillna(df, sparse_feat, dense_feat):
     for sp in sparse_feat:
+        if sp not in df.columns:
+            raise KeyError(f"missing sparse feature column: {sp}")
         df[sp].fillna('-1', inplace=True)
     
     for ds in dense_feat:
+        if ds not in df.columns:
+            # Backward compatibility for old cached training data without newly-added dense features.
+            df[ds] = 0.0
         df[ds].fillna(0.0, inplace=True)
     
     return df

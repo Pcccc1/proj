@@ -50,7 +50,7 @@ basic_columns = ['user_id', 'item_id', 'phase', 'label']
 time_columns = ['time', 'day_id', 'hour_id', 'minute_id']
 hist_columns = ['hist_item_id', 'hist_time', 'hist_day_id', 'hist_hour_id', 'hist_minute_id']
 sim_columns = ['sim', 'sum_sim2int_1', 'sum_sim2int_2', 'sum_sim2int_3'] + \
-                ['max_sim2int_1', 'max_sim2int_2', 'max_sim2int_3'] + \
+                ['max_sim2int_1', 'max_sim2int_2', 'max_sim2int_3', 'sim_rank_score'] + \
                 ['cnt_sim2int_1', 'cnt_sim2int_2', 'cnt_sim2int_3']
 hist_cnt_sim_feat = ['txt_cnt_sim_last_1', 'img_cnt_sim_last_1', 'cnt_sim_last_1'] + \
                     ['txt_cnt_sim_last_2', 'img_cnt_sim_last_2', 'cnt_sim_last_2'] + \
