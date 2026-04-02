@@ -26,7 +26,7 @@ def get_init_item_embed(item_raw_id2_idx_dict, item_content_vec_dict):
 
 def get_init_user_embed(target_phase, user_raw_id2_idx_dict, item_content_vec_dict, is_use_whole_click=True):
     global user_embed_np
-    all_click, click_q_time = get_phase_click(target_phase)
+    all_click, click_q_time = get_phase_click(phase=target_phase)
     if is_use_whole_click:
         phase_click = get_whole_phase_click(all_click, click_q_time)
     else:
