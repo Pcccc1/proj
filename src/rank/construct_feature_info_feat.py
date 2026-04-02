@@ -15,8 +15,11 @@ def get_word2vec_feat(full_user_item_df):
     run_time = end_time - begin_time
     print(f'word2vec time: {round(run_time, 2)}')
 
-    vocab_list = [(k, model.wv[k]) for k, v in model.wv.vocab.items()]
-    word2vec_item_embed_dict = dict(vocab_list)
+    if hasattr(model.wv, 'key_to_index'):
+        vocab_keys = model.wv.key_to_index.keys()
+    else:
+        vocab_keys = model.wv.vocab.keys()
+    word2vec_item_embed_dict = {k: model.wv[k] for k in vocab_keys}
 
     return word2vec_item_embed_dict
 
