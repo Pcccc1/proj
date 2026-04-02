@@ -66,10 +66,19 @@ def sub2_df(filename):
     with open(filename) as f:
         for line in f:
             row = line.strip().split(',')
-            uid = row[0]
+            if len(row) < 2:
+                continue
+            try:
+                uid = int(row[0])
+            except ValueError:
+                # Skip non-data line (e.g. accidental header).
+                continue
+
             iids = row[1:]
             phase = uid % 11
             for idx, iid in enumerate(iids):
+                if iid == '':
+                    continue
                 rec_items.append((uid, int(iid), constant_sim - idx, phase))
     
     return pd.DataFrame(rec_items, columns=['user_id', 'item_id', 'sim', 'phase'])
