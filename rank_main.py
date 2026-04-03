@@ -31,21 +31,21 @@ def rank_pipline(target_phase, train_full_df_dict, processed_item_feat, item_con
 
     def gen_rec_results(output_model_name):
         global total_recom_lgb_df
-        if mode == 'offline':
+        if mode == 'online':
             assert len(set(infer_recall_recom_df['user_id'].unique()) - set(total_recom_lgb_df[total_recom_lgb_df['phase'] == target_phase].user_id.unique()))  == 0
-        total_recom_lgb_df = total_recom_lgb_df[total_recom_lgb_df['phase'] != target_phase]
-        online_infer_recall_df = infer_recall_recom_df[['user_id', 'item_id', 'prob']].rename(columns={'prob': 'sim'})
-        online_infer_recall_df['phase'] = target_phase
-        total_recom_lgb_df = pd.concat([total_recom_lgb_df, online_infer_recall_df], axis=0)
+            total_recom_lgb_df = total_recom_lgb_df[total_recom_lgb_df['phase'] != target_phase]
+            online_infer_recall_df = infer_recall_recom_df[['user_id', 'item_id', 'prob']].rename(columns={'prob': 'sim'})
+            online_infer_recall_df['phase'] = target_phase
+            total_recom_lgb_df = pd.concat([total_recom_lgb_df, online_infer_recall_df], axis=0)
 
-        _, top50_click = obtain_topk_click()
-        result = get_predict(total_recom_lgb_df, 'sim', top50_click)
+            _, top50_click = obtain_topk_click()
+            result = get_predict(total_recom_lgb_df, 'sim', top50_click)
 
-        rank_output_dir = os.path.join(user_data_dir, 'rank')
-        if not os.path.exists(rank_output_dir):
-            os.makedirs(rank_output_dir)
-        result.to_csv(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}', index=False, header=None)
-        pickle.dump(total_recom_lgb_df, open(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}-pkl', 'wb'))
+            rank_output_dir = os.path.join(user_data_dir, 'rank')
+            if not os.path.exists(rank_output_dir):
+                os.makedirs(rank_output_dir)
+            result.to_csv(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}', index=False, header=None)
+            pickle.dump(total_recom_lgb_df, open(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}-pkl', 'wb'))
         print('generate rank result done')
 
     if 'ranker' in model_names:
