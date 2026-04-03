@@ -31,21 +31,41 @@ def rank_pipline(target_phase, train_full_df_dict, processed_item_feat, item_con
 
     def gen_rec_results(output_model_name):
         global total_recom_lgb_df
+        if 'user_id' in total_recom_lgb_df.columns:
+            total_recom_lgb_df['user_id'] = total_recom_lgb_df['user_id'].astype(int)
+        if 'item_id' in total_recom_lgb_df.columns:
+            total_recom_lgb_df['item_id'] = total_recom_lgb_df['item_id'].astype(int)
+        if 'sim' in total_recom_lgb_df.columns:
+            total_recom_lgb_df['sim'] = total_recom_lgb_df['sim'].astype(float)
+
+        online_infer_recall_df = infer_recall_recom_df[['user_id', 'item_id', 'prob']].rename(columns={'prob': 'sim'})
+        online_infer_recall_df['phase'] = target_phase
+        online_infer_recall_df['user_id'] = online_infer_recall_df['user_id'].astype(int)
+
         if mode == 'online':
-            assert len(set(infer_recall_recom_df['user_id'].unique()) - set(total_recom_lgb_df[total_recom_lgb_df['phase'] == target_phase].user_id.unique()))  == 0
+            if 'phase' not in total_recom_lgb_df.columns:
+                total_recom_lgb_df['phase'] = -1
             total_recom_lgb_df = total_recom_lgb_df[total_recom_lgb_df['phase'] != target_phase]
-            online_infer_recall_df = infer_recall_recom_df[['user_id', 'item_id', 'prob']].rename(columns={'prob': 'sim'})
-            online_infer_recall_df['phase'] = target_phase
-            total_recom_lgb_df = pd.concat([total_recom_lgb_df, online_infer_recall_df], axis=0)
+        else:
+            # Offline user ids may appear in multiple phases; do replacement by target users instead of uid % 11 phase.
+            target_users = set(online_infer_recall_df['user_id'].unique())
+            total_recom_lgb_df = total_recom_lgb_df[~total_recom_lgb_df['user_id'].astype(int).isin(target_users)]
 
-            _, top50_click = obtain_topk_click()
-            result = get_predict(total_recom_lgb_df, 'sim', top50_click)
+        total_recom_lgb_df = pd.concat([total_recom_lgb_df, online_infer_recall_df], axis=0, ignore_index=True)
 
-            rank_output_dir = os.path.join(user_data_dir, 'rank')
-            if not os.path.exists(rank_output_dir):
-                os.makedirs(rank_output_dir)
-            result.to_csv(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}', index=False, header=None)
-            pickle.dump(total_recom_lgb_df, open(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}-pkl', 'wb'))
+        _, top50_click = obtain_topk_click()
+        result = get_predict(total_recom_lgb_df, 'sim', top50_click)
+
+        rank_output_dir = os.path.join(user_data_dir, 'rank')
+        if not os.path.exists(rank_output_dir):
+            os.makedirs(rank_output_dir)
+        result.to_csv(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}', index=False, header=None)
+        pickle.dump(total_recom_lgb_df, open(f'{rank_output_dir}/{output_model_name}-{output_ranking_filename}-pkl', 'wb'))
+
+        if mode == 'offline':
+            # Also save phase-local ranking file for offline evaluation/debugging.
+            phase_result = get_predict(online_infer_recall_df[['user_id', 'item_id', 'sim']], 'sim', top50_click)
+            phase_result.to_csv(f'{rank_output_dir}/{output_model_name}-phase_{target_phase}-{output_ranking_filename}', index=False, header=None)
         print('generate rank result done')
 
     if 'ranker' in model_names:
